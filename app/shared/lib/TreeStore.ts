@@ -22,6 +22,37 @@ export class TreeStore<T extends TreeItem = TreeItem> {
     return this.childrenByParent.get(id) ?? []
   }
 
+  getAllChildren(id: TreeItemId): T[] {
+    const result: T[] = []
+    const queue = [...this.getChildren(id)]
+
+    while (queue.length > 0) {
+      const child = queue.shift()!
+      result.push(child)
+      queue.push(...this.getChildren(child.id))
+    }
+
+    return result
+  }
+
+  getAllParents(id: TreeItemId): T[] {
+    const parents: T[] = []
+    let current = this.byId.get(id)
+
+    while (current?.parent != null) {
+      const parent = this.byId.get(current.parent)
+
+      if (!parent) {
+        break
+      }
+
+      parents.push(parent)
+      current = parent
+    }
+
+    return parents
+  }
+
   addItem(item: T): void {
     this.items.push(item)
     this.byId.set(item.id, item)
