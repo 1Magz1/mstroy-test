@@ -1,4 +1,4 @@
-import type { TreeItem, TreeItemId } from '../types/tree'
+import type { TreeItem, TreeItemId, TreeRow } from '../types/tree'
 
 export class TreeStore<T extends TreeItem = TreeItem> {
   private readonly items: T[]
@@ -108,6 +108,26 @@ export class TreeStore<T extends TreeItem = TreeItem> {
 
   hasChildren(id: TreeItemId): boolean {
     return this.getChildren(id).length > 0
+  }
+
+  getPath(id: TreeItemId): TreeItemId[] {
+    const item = this.byId.get(id)
+
+    if (!item) {
+      return []
+    }
+
+    return [
+      ...this.getAllParents(id).reverse().map(parent => parent.id),
+      item.id,
+    ]
+  }
+
+  getTreeRows(): TreeRow[] {
+    return this.items.map(item => ({
+      ...item,
+      path: this.getPath(item.id),
+    }))
   }
 
   private buildIndexes(): void {
