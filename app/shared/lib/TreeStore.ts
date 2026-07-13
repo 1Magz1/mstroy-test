@@ -36,21 +36,20 @@ export class TreeStore<T extends TreeItem = TreeItem> {
   }
 
   getAllParents(id: TreeItemId): T[] {
-    const parents: T[] = []
+    const chain: T[] = []
     let current = this.byId.get(id)
 
-    while (current?.parent != null) {
-      const parent = this.byId.get(current.parent)
+    while (current) {
+      chain.push(current)
 
-      if (!parent) {
+      if (current.parent == null) {
         break
       }
 
-      parents.push(parent)
-      current = parent
+      current = this.byId.get(current.parent)
     }
 
-    return parents
+    return chain
   }
 
   addItem(item: T): void {
@@ -106,28 +105,15 @@ export class TreeStore<T extends TreeItem = TreeItem> {
     this.items.length = writeIndex
   }
 
-  hasChildren(id: TreeItemId): boolean {
-    return this.getChildren(id).length > 0
-  }
-
-  getPath(id: TreeItemId): TreeItemId[] {
-    const item = this.byId.get(id)
-
-    if (!item) {
-      return []
-    }
-
-    return [
-      ...this.getAllParents(id).reverse().map(parent => parent.id),
-      item.id,
-    ]
-  }
-
   getTreeRows(): TreeRow[] {
     return this.items.map(item => ({
       ...item,
       path: this.getPath(item.id),
     }))
+  }
+
+  private getPath(id: TreeItemId): TreeItemId[] {
+    return this.getAllParents(id).reverse().map(item => item.id)
   }
 
   private buildIndexes(): void {
