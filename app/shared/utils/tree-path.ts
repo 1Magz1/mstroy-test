@@ -15,7 +15,3 @@ export function buildTreeRows(items: TreeItem[]): TreeRow[] {
     return { ...item, path }
   })
 }
-
-export function hasChildren(items: TreeItem[], id: TreeItemId): boolean {
-  return items.some(item => item.parent === id)
-}
