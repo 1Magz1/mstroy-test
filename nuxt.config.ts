@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  modules: ['@nuxt/test-utils/module'],
   css: [
     'ag-grid-community/styles/ag-grid.css',
     'ag-grid-community/styles/ag-theme-quartz.css',
