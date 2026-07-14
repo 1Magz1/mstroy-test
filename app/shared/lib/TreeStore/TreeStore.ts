@@ -1,4 +1,4 @@
-import type { TreeItem, TreeItemId, TreeRow } from '../types/tree'
+import type { TreeItem, TreeItemId, TreeRow } from '../../types/tree'
 
 export class TreeStore<T extends TreeItem = TreeItem> {
   private readonly items: T[]
