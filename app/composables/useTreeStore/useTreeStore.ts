@@ -1,4 +1,4 @@
-import { TreeStore } from '~/shared/lib/TreeStore'
+import { TreeStore } from '~/shared/lib/TreeStore/TreeStore'
 import type { TreeItem, TreeItemId } from '~/shared/types/tree'
 
 export function useTreeStore<T extends TreeItem>(initialItems: T[]) {
