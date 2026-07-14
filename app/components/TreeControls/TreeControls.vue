@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TreeStore } from '~/shared/lib/TreeStore'
+import type { TreeStore } from '~/shared/lib/TreeStore/TreeStore'
 import type { TreeItem, TreeItemId } from '~/shared/types/tree'
 
 const props = defineProps<{
@@ -124,7 +124,7 @@ function onRemove() {
 </script>
 
 <template>
-  <section class="controls">
+  <section class="controls" data-testid="tree-controls">
     <div class="controls__header">
       <h2 class="controls__title">
         Управление данными
@@ -132,7 +132,7 @@ function onRemove() {
       <p class="controls__hint">
         Выберите строку в таблице или заполните форму для добавления элемента.
       </p>
-      <p class="controls__path">
+      <p class="controls__path" data-testid="tree-controls-path">
         <span class="controls__path-label">Путь к корню:</span>
         {{ parentPathLabel }}
       </p>
@@ -144,6 +144,7 @@ function onRemove() {
         <input
           v-model="form.id"
           type="text"
+          data-testid="tree-controls-id-input"
           placeholder="Авто при добавлении"
           :disabled="disabled || selectedId == null"
         >
@@ -154,6 +155,7 @@ function onRemove() {
         <input
           v-model="form.label"
           type="text"
+          data-testid="tree-controls-label-input"
           placeholder="Айтем"
           :disabled="disabled"
         >
@@ -161,7 +163,11 @@ function onRemove() {
 
       <label class="controls__field">
         <span>Родитель</span>
-        <select v-model="form.parent" :disabled="disabled">
+        <select
+          v-model="form.parent"
+          data-testid="tree-controls-parent-select"
+          :disabled="disabled"
+        >
           <option :value="null">
             Корень
           </option>
@@ -180,6 +186,7 @@ function onRemove() {
       <button
         type="button"
         class="controls__button controls__button--primary"
+        data-testid="tree-controls-add-button"
         :disabled="disabled"
         @click="onAdd"
       >
@@ -189,6 +196,7 @@ function onRemove() {
       <button
         type="button"
         class="controls__button"
+        data-testid="tree-controls-update-button"
         :disabled="disabled || selectedId == null"
         @click="onUpdate"
       >
@@ -198,6 +206,7 @@ function onRemove() {
       <button
         type="button"
         class="controls__button controls__button--danger"
+        data-testid="tree-controls-remove-button"
         :disabled="disabled || selectedId == null"
         @click="onRemove"
       >
