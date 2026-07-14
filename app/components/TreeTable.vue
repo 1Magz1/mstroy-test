@@ -4,20 +4,30 @@ import { AllEnterpriseModule, ModuleRegistry } from 'ag-grid-enterprise'
 import type {
   ColDef,
   GetDataPath,
+  GridApi,
   GridReadyEvent,
+  RowClickedEvent,
   ValueGetterParams,
 } from 'ag-grid-community'
 
-import type { TreeItem, TreeRow } from '../../shared/types/tree'
-import { buildTreeRows, hasChildren } from '../../shared/utils/tree-path'
+import type { TreeStore } from '~/shared/lib/TreeStore'
+import type { TreeItem, TreeItemId, TreeRow } from '~/shared/types/tree'
 
 ModuleRegistry.registerModules([AllEnterpriseModule])
 
 const props = defineProps<{
-  items: TreeItem[]
+  store: TreeStore<TreeItem>
+  treeRows: TreeRow[]
+  selectedId?: TreeItemId | null
 }>()
 
-const rowData = computed(() => buildTreeRows(props.items))
+const emit = defineEmits<{
+  select: [id: TreeItemId | null]
+}>()
+
+const gridApi = shallowRef<GridApi<TreeRow> | null>(null)
+
+const rowData = computed(() => props.treeRows)
 
 const getDataPath: GetDataPath<TreeRow> = data => data.path.map(String)
 
@@ -48,6 +58,8 @@ const columnDefs: ColDef<TreeRow>[] = [
 const autoGroupColumnDef = computed<ColDef<TreeRow>>(() => ({
   headerName: 'Категория',
   minWidth: 220,
+  suppressHeaderMenuButton: true,
+  suppressHeaderFilterButton: true,
   valueGetter: (params: ValueGetterParams<TreeRow>) => {
     const id = params.data?.id
 
@@ -55,7 +67,7 @@ const autoGroupColumnDef = computed<ColDef<TreeRow>>(() => ({
       return ''
     }
 
-    return hasChildren(props.items, id) ? 'Группа' : 'Элемент'
+    return props.store.getChildren(id).length > 0 ? 'Группа' : 'Элемент'
   },
   cellRendererParams: {
     suppressCount: true,
@@ -64,11 +76,51 @@ const autoGroupColumnDef = computed<ColDef<TreeRow>>(() => ({
 
 const defaultColDef: ColDef<TreeRow> = {
   resizable: true,
+  sortable: false,
+  filter: false,
+  suppressHeaderMenuButton: true,
+  suppressHeaderFilterButton: true,
+}
+
+const rowClassRules = {
+  'tree-table__row--selected': (params: { data?: TreeRow }) =>
+    params.data?.id === props.selectedId,
+}
+
+function refreshGrid() {
+  if (!gridApi.value) {
+    return
+  }
+
+  gridApi.value.setGridOption('rowData', rowData.value)
+  gridApi.value.refreshClientSideRowModel('group')
+  gridApi.value.expandAll()
+  gridApi.value.redrawRows()
 }
 
 function onGridReady(event: GridReadyEvent<TreeRow>) {
-  event.api.expandAll()
+  gridApi.value = event.api
+  refreshGrid()
 }
+
+function onRowClicked(event: RowClickedEvent<TreeRow>) {
+  emit('select', event.data?.id ?? null)
+}
+
+watch(
+  rowData,
+  () => {
+    nextTick(refreshGrid)
+  },
+  { deep: true },
+)
+
+watch(
+  () => props.selectedId,
+  () => {
+    gridApi.value?.redrawRows()
+  },
+)
 </script>
 
 <template>
@@ -78,27 +130,33 @@ function onGridReady(event: GridReadyEvent<TreeRow>) {
       :column-defs="columnDefs"
       :default-col-def="defaultColDef"
       :auto-group-column-def="autoGroupColumnDef"
+      :row-class-rules="rowClassRules"
       :tree-data="true"
       :get-data-path="getDataPath"
       :group-default-expanded="-1"
       :animate-rows="false"
       dom-layout="autoHeight"
       @grid-ready="onGridReady"
+      @row-clicked="onRowClicked"
     />
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .tree-table {
   width: 100%;
-}
 
-.tree-table :deep(.ag-root-wrapper) {
-  border: 1px solid #d7dce3;
-  border-radius: 4px;
-}
+  :deep(.ag-root-wrapper) {
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+  }
 
-.tree-table :deep(.ag-header-cell-label) {
-  font-weight: 600;
+  :deep(.ag-header-cell-label) {
+    font-weight: 600;
+  }
+
+  :deep(.tree-table__row--selected) {
+    background-color: $color-bg-selected;
+  }
 }
 </style>
