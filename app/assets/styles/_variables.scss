@@ -6,7 +6,9 @@ $color-border: #d7dce3;
 $color-border-input: #cbd2d9;
 
 $color-bg-page: #fff;
-$color-bg-panel: #f8fafc;
+$color-bg-layout: #f2f2f2;
+$color-bg-header: #f0f2f5;
+$color-bg-panel: #fff;
 $color-bg-input-disabled: #eef2f6;
 $color-bg-hover: #f5f7fa;
 $color-bg-selected: #e8f1ff;
@@ -21,3 +23,6 @@ $radius-md: 6px;
 $radius-lg: 8px;
 
 $font-family: Inter, system-ui, sans-serif;
+
+$table-row-height: 48px;
+$table-header-height: 48px;
