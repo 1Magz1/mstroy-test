@@ -10,7 +10,7 @@ import type {
   ValueGetterParams,
 } from 'ag-grid-community'
 
-import type { TreeStore } from '~/shared/lib/TreeStore'
+import type { TreeStore } from '~/shared/lib/TreeStore/TreeStore'
 import type { TreeItem, TreeItemId, TreeRow } from '~/shared/types/tree'
 
 ModuleRegistry.registerModules([AllEnterpriseModule])
