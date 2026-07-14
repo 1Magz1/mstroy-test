@@ -10,5 +10,12 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: ['ag-grid-vue3', 'ag-grid-enterprise'],
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@use "~/assets/styles/variables" as *;',
+        },
+      },
+    },
   },
 })
